@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" 
+	xmlns:sec="http://www.springframework.org/schema/security"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+
+    <context:property-placeholder location="classpath:/client.properties" />
+
+    <context:component-scan base-package="com.ohadr.*" />
+
+    <context:annotation-config />
+
+    <mvc:default-servlet-handler />
+
+    <mvc:annotation-driven/>
+
+
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix">
+            <value>/WEB-INF/pages/</value>
+        </property>
+        <property name="suffix">
+            <value>.jsp</value>
+        </property>
+    </bean>
+
+    <sec:http pattern="/login/**" security="none" />
+    <sec:http pattern="/forgotPasswordPage" security="none" />
+    <sec:http pattern="/createAccountPage" security="none" />
+    <sec:http pattern="/createAccount" security="none" />
+
+
+	<sec:http authentication-manager-ref="authenticationManager">
+		<sec:intercept-url pattern="/secure/**" access="hasRole('ROLE_USER')" />
+		<sec:anonymous/>
+
+        <!-- sec:form-login/-->
+        <sec:csrf disabled="true"/>
+        
+        
+		<sec:form-login 
+			login-page="/login/login.jsp?login_error=1" 
+			login-processing-url="/j_spring_security_check" />
+
+        <sec:remember-me 
+			data-source-ref="dataSource"
+			user-service-ref="userDetailsService"/>
+
+        
+	</sec:http>
+
+	<!-- bean name="loginUrlAuthenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+		<property name="loginFormUrl" value="/oauth/commence" />
+		<property name="useForward" value="false" />
+	</bean-->
+
+
+    <!--  for test purposes, work without JDBC 
+
+    <sec:authentication-manager alias="authenticationManager">
+		<sec:authentication-provider user-service-ref="userDetailsService"/>
+	</sec:authentication-manager>
+	
+	<sec:user-service id="userDetailsService">
+		<sec:user name="admin"  password="admin"  authorities="ROLE_USER,ROLE_ADMIN" />
+	</sec:user-service>
+	
+	-->
+	<!-- till here test -->
+	
+
+
+	<sec:authentication-manager alias="authenticationManager">
+		<sec:authentication-provider user-service-ref="userDetailsService" >
+			<sec:password-encoder hash="sha-256">
+				<sec:salt-source user-property="username"/>
+			</sec:password-encoder>
+		</sec:authentication-provider>
+	</sec:authentication-manager>
+
+
+    <bean id="userDetailsService"
+          class="org.springframework.security.provisioning.JdbcUserDetailsManager">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="enableGroups" value="false"/>
+        <property name="rolePrefix" value="ROLE_"/>
+    </bean>
+    
+
+
+	<bean id="passwordEncoder" 	class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
+		<constructor-arg value="256"/>
+	</bean>
+	
+	
+
+    <!-- data-source -->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="url"
+			value="jdbc:mysql://${com.ohadr.oauth2.db.host}:${com.ohadr.oauth2.db.port}/MFA?allowMultiQueries=true&amp;characterEncoding=UTF-8" />
+        <property name="username" value="${com.ohadr.oauth2.db.username}"/>	<!-- OhadDB -->
+        <property name="password" value="${com.ohadr.oauth2.db.password}"/> <!-- ohad0921 -->
+	</bean>
+
+
+
+</beans>
