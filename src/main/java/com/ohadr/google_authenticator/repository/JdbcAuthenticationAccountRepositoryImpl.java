@@ -11,6 +11,7 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+import org.objectweb.asm.Type;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -24,7 +25,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 
-@Repository
 public class JdbcAuthenticationAccountRepositoryImpl extends AbstractAuthenticationAccountRepository
 		implements InitializingBean
 {
@@ -37,12 +37,10 @@ public class JdbcAuthenticationAccountRepositoryImpl extends AbstractAuthenticat
 			+ "enabled, "
 			+ "LOGIN_ATTEMPTS_COUNTER, "
 			+ "LAST_PSWD_CHANGE_DATE, "
-			+ "FIRSTNAME, "
-			+ "LASTNAME, "
 			+ "authorities";
 
 	private static final String DEFAULT_USER_INSERT_STATEMENT = "insert into " + TABLE_NAME + "(" + AUTHENTICATION_USER_FIELDS
-			+ ") values (?,?,?,?,?,?,?,?)";
+			+ ") values (?,?,?,?,?,?)";
 
 	private static final String DEFAULT_USER_SELECT_STATEMENT = "select " + AUTHENTICATION_USER_FIELDS
 			+ " from " + TABLE_NAME + " where USERNAME = ?";
@@ -85,9 +83,10 @@ public class JdbcAuthenticationAccountRepositoryImpl extends AbstractAuthenticat
 				new Object[] { user.getUsername(),
 						user.getPassword(),
 					false,
+					5,
 					new Date( System.currentTimeMillis()),
 					user.getAuthorities()},
-				new int[] { Types.VARCHAR, Types.VARCHAR, Types.BOOLEAN, Types.DATE, Types.VARCHAR });
+				new int[] { Types.VARCHAR, Types.VARCHAR, Types.BOOLEAN, Type.INT, Types.DATE, Types.VARCHAR });
 
 		if(rowsUpdated != 1)
 		{
@@ -145,13 +144,13 @@ public class JdbcAuthenticationAccountRepositoryImpl extends AbstractAuthenticat
 	{
 		public UserDetails mapRow(ResultSet rs, int rowNum) throws SQLException 
 		{
-			String roleName = rs.getString(8);			//column 8 : authorities
+			String roleName = rs.getString(6);			//column 6 : authorities
 			GrantedAuthority userAuth = new SimpleGrantedAuthority(roleName);
 			Set<GrantedAuthority> authSet = new HashSet<GrantedAuthority>();
 			authSet.add(userAuth);
 			
 			UserDetails user = new InMemoryAuthenticationUserImpl(
-					rs.getString(1),		//username / email
+					rs.getString(1),		//username
 					rs.getString(2),		//password
 					rs.getBoolean(3),		//activated?
 					rs.getInt(4),			//attempts left

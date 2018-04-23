@@ -32,6 +32,7 @@ public class UserActions {
 	public static final String USER_ALREADY_EXIST = "USER_ALREADY_EXIST";
 	private static final String LOGIN_FORMS_DIR = "login";
 	public static final String EMAIL_PARAM_NAME = "email";
+	private static final String CONFIRM_PASSWORD_PARAM_NAME = "confirm_password";
 
 	@Autowired
 	private AuthenticationAccountRepository repository;
@@ -52,7 +53,7 @@ public class UserActions {
 	final protected View createAccount(
 			@RequestParam( EMAIL_PARAM_NAME ) String email,
 			@RequestParam("password") String password,
-			@RequestParam( "FlowsConstatns.CONFIRM_PASSWORD_PARAM_NAME" ) String retypedPassword,
+			@RequestParam( CONFIRM_PASSWORD_PARAM_NAME ) String retypedPassword,
 			HttpServletRequest request,
 			HttpServletResponse response) throws Exception
 	{
