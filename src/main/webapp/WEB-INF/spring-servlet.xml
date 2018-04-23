@@ -33,7 +33,6 @@
     </bean>
 
     <sec:http pattern="/login/**" security="none" />
-    <sec:http pattern="/forgotPasswordPage" security="none" />
     <sec:http pattern="/createAccountPage" security="none" />
     <sec:http pattern="/createAccount" security="none" />
 
@@ -50,11 +49,6 @@
 			login-page="/login/login.jsp?login_error=1" 
 			login-processing-url="/j_spring_security_check" />
 
-        <sec:remember-me 
-			data-source-ref="dataSource"
-			user-service-ref="userDetailsService"/>
-
-        
 	</sec:http>
 
 	<!-- bean name="loginUrlAuthenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
