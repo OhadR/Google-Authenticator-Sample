@@ -1,6 +1,5 @@
-package com.ohadr.security.oauth.examples.web;
+package com.ohadr.google_authenticator.web;
 
-import java.io.PrintWriter;
 import java.util.*;
 
 import javax.servlet.http.*;

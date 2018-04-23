@@ -41,13 +41,13 @@
 		<sec:intercept-url pattern="/secure/**" access="hasRole('ROLE_USER')" />
 		<sec:anonymous/>
 
-        <!-- sec:form-login/-->
         <sec:csrf disabled="true"/>
         
         
 		<sec:form-login 
 			login-page="/login/login.jsp?login_error=1" 
-			login-processing-url="/j_spring_security_check" />
+			login-processing-url="/j_spring_security_check"
+			authentication-details-source-ref="customWebAuthenticationDetailsSource" />
 
 	</sec:http>
 
