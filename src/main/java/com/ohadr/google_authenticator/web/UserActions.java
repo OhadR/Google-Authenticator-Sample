@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.RedirectView;
 
+import com.ohadr.google_authenticator.QRCodeGenerator;
 import com.ohadr.google_authenticator.TOTPCodeUtils;
 import com.ohadr.google_authenticator.repository.AuthenticationAccountRepository;
 import com.ohadr.google_authenticator.repository.InMemoryAuthenticationUserImpl;
@@ -33,7 +34,8 @@ public class UserActions {
 	private static final String LOGIN_FORMS_DIR = "login";
 	public static final String EMAIL_PARAM_NAME = "email";
 	private static final String CONFIRM_PASSWORD_PARAM_NAME = "confirm_password";
-
+	private static final String USE_MFA_PARAM_NAME = "using2FA";
+	
 	@Autowired
 	private AuthenticationAccountRepository repository;
 
@@ -54,6 +56,7 @@ public class UserActions {
 			@RequestParam( EMAIL_PARAM_NAME ) String email,
 			@RequestParam("password") String password,
 			@RequestParam( CONFIRM_PASSWORD_PARAM_NAME ) String retypedPassword,
+//			@RequestParam( USE_MFA_PARAM_NAME ) boolean useMfa,
 			HttpServletRequest request,
 			HttpServletResponse response) throws Exception
 	{
@@ -62,9 +65,15 @@ public class UserActions {
 //		request.setAttribute("email", email);
 		Map<String, String> attributes = new HashMap<String, String>();
 		attributes.put(EMAIL_PARAM_NAME,  email);		
+//		model.addAttribute("qr", userService.generateQRUrl(user));
 
-		
-		createAccount(email, password, retypedPassword);
+		String secretKey = TOTPCodeUtils.getRandomSecretKey();
+		String QRUrl = QRCodeGenerator.generateQRUrl(secretKey, email, email);
+		attributes.put("qr",  QRUrl);
+		log.info("secretKey= " + secretKey);
+		log.info("QRUrl= " + QRUrl);
+
+		createAccount(email, password, retypedPassword, secretKey);
 		
 		//adding attributes to the redirect return value:
 		rv.setAttributesMap(attributes);
@@ -74,18 +83,6 @@ public class UserActions {
 
 	}
 
-	public void createAccount(
-			String email,
-			String password,
-			String retypedPassword) throws Exception
-	{
-		validateRetypedPassword(password, retypedPassword);
-
-		//encoding the password:
-		String encodedPassword = encodeString(email, password);
-
-		internalCreateAccount(email, encodedPassword);
-	}
 	
 	private void validateRetypedPassword(String password, String retypedPassword)
 	{
@@ -104,20 +101,26 @@ public class UserActions {
 	}
 
 
-	private void internalCreateAccount(
+	public void createAccount(
 			String email,
-			String encodedPassword 
-			) throws Exception 
+			String password,
+			String retypedPassword,
+			String randomSecretKey) throws Exception
 	{
-		email = email.toLowerCase();		// issue #23 : username is case-sensitive (https://github.com/OhadR/oAuth2-sample/issues/23)
+		validateRetypedPassword(password, retypedPassword);
+
+		//encoding the password:
+		String encodedPassword = encodeString(email, password);
+
+		email = email.toLowerCase();
 		log.info("createAccount() for user " + email);
 
 		try
 		{
-			User oauthUser = null;
+			UserDetails oauthUser = null;
 			try
 			{
-				oauthUser = (User) repository.loadUserByUsername( email );
+				oauthUser = repository.loadUserByUsername( email );
 			}
 			catch(UsernameNotFoundException unfe)
 			{
@@ -135,10 +138,10 @@ public class UserActions {
 			Collection<? extends GrantedAuthority> authorities = setAuthorities();		//set authorities
 			UserDetails user = new InMemoryAuthenticationUserImpl(
 					email, encodedPassword, 
-					false,									//start as de-activated
+					true,									//NOTE: start as activated
 					5, //MaxPasswordEntryAttempts
 					null,					//set by the repo-impl
-					TOTPCodeUtils.getRandomSecretKey(),
+					randomSecretKey,
 					authorities);			
 
 			repository.createUser(user);

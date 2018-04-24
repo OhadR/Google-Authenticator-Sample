@@ -27,3 +27,5 @@ References
 http://www.asaph.org/2016/04/google-authenticator-2fa-java.html
 
 https://github.com/asaph/twofactorauth
+
+http://www.baeldung.com/spring-security-two-factor-authentication-with-soft-token

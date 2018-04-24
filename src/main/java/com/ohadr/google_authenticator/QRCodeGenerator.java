@@ -13,6 +13,15 @@ import com.google.zxing.common.BitMatrix;
 
 public class QRCodeGenerator {
 
+	public static String QR_PREFIX = 
+			"https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=";
+			
+	public static String generateQRUrl(String secretKey, String account, String issuer) throws UnsupportedEncodingException 
+	{
+		return QR_PREFIX 
+			+ URLEncoder.encode( getGoogleAuthenticatorBarCode(secretKey, account, issuer), "UTF-8");
+	}
+
 	/**
 	 * 
      * @param secretKey Base32 encoded secret key (may have optional whitespace)
