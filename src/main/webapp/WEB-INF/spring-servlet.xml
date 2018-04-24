@@ -73,12 +73,13 @@
 
 
 	<sec:authentication-manager alias="authenticationManager">
-		<sec:authentication-provider user-service-ref="userDetailsService" >
-			<sec:password-encoder hash="sha-256">
-				<sec:salt-source user-property="username"/>
-			</sec:password-encoder>
-		</sec:authentication-provider>
+		<sec:authentication-provider ref="customAuthenticationProvider" />
 	</sec:authentication-manager>
+
+	<bean id="customAuthenticationProvider" class="com.ohadr.google_authenticator.authentication.dao.CustomAuthenticationProvider">
+        <property name="passwordEncoder" ref="passwordEncoder"/>
+        <property name="userDetailsService" ref="userDetailsService"/>
+	</bean>
 
 
 	<!-- 

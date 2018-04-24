@@ -1,20 +1,27 @@
 package com.ohadr.google_authenticator.authentication.dao;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
+
 public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 
-	@Autowired
-	private UserRepository userRepository;
+	private static Logger log = Logger.getLogger(CustomAuthenticationProvider.class);
+
+//	@Autowired
+//	private UserRepository userRepository;
 
 	@Override
 	public Authentication authenticate(Authentication auth)
 			throws AuthenticationException {
-		String verificationCode 
+		log.info("xxxxxxxxx");
+		
+/*		String verificationCode 
 		= ((CustomWebAuthenticationDetails) auth.getDetails())
 		.getVerificationCode();
 		User user = userRepository.findByEmail(auth.getName());
@@ -27,10 +34,11 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 				throw new BadCredentialsException("Invalid verfication code");
 			}
 		}
-
+*/
 		Authentication result = super.authenticate(auth);
 		return new UsernamePasswordAuthenticationToken(
-				user, result.getCredentials(), result.getAuthorities());
+//				user, result.getCredentials(), result.getAuthorities());
+				null, result.getCredentials(), result.getAuthorities());
 	}
 
 	private boolean isValidLong(String code) {

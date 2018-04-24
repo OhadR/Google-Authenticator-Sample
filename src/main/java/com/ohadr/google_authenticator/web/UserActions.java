@@ -96,7 +96,9 @@ public class UserActions {
 	
 	private String encodeString(String salt, String rawPass) 
 	{
-        String encodedPassword = passwordEncoder.encodePassword(rawPass, salt);	//the email is the salt
+		//the 'username' should be the salt (rather than null), but we use custom authentication provider, 
+		//so it is problematic to send the salt... (during retrival it does not work)
+		String encodedPassword = passwordEncoder.encodePassword(rawPass, null);	
 		return encodedPassword;
 	}
 
