@@ -24,6 +24,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
+import com.ohadr.google_authenticator.TOTPCodeUtils;
+
 
 public class JdbcAuthenticationAccountRepositoryImpl extends AbstractAuthenticationAccountRepository
 		implements InitializingBean
@@ -37,10 +39,11 @@ public class JdbcAuthenticationAccountRepositoryImpl extends AbstractAuthenticat
 			+ "enabled, "
 			+ "LOGIN_ATTEMPTS_COUNTER, "
 			+ "LAST_PSWD_CHANGE_DATE, "
+			+ "MFA_SECRET_KEY, "
 			+ "authorities";
 
 	private static final String DEFAULT_USER_INSERT_STATEMENT = "insert into " + TABLE_NAME + "(" + AUTHENTICATION_USER_FIELDS
-			+ ") values (?,?,?,?,?,?)";
+			+ ") values (?,?,?,?,?,?,?)";
 
 	private static final String DEFAULT_USER_SELECT_STATEMENT = "select " + AUTHENTICATION_USER_FIELDS
 			+ " from " + TABLE_NAME + " where USERNAME = ?";
@@ -79,14 +82,16 @@ public class JdbcAuthenticationAccountRepositoryImpl extends AbstractAuthenticat
 	@Override
 	public void createUser(UserDetails user)
 	{
+		InMemoryAuthenticationUserImpl userImpl = (InMemoryAuthenticationUserImpl)user;
 		int rowsUpdated = jdbcTemplate.update(DEFAULT_USER_INSERT_STATEMENT,
 				new Object[] { user.getUsername(),
-						user.getPassword(),
-					false,
+					user.getPassword(),
+					user.isEnabled(),
 					5,
 					new Date( System.currentTimeMillis()),
+					userImpl.getMfaSecretKey(),
 					user.getAuthorities()},
-				new int[] { Types.VARCHAR, Types.VARCHAR, Types.BOOLEAN, Type.INT, Types.DATE, Types.VARCHAR });
+				new int[] { Types.VARCHAR, Types.VARCHAR, Types.BOOLEAN, Type.INT, Types.DATE, Types.VARCHAR, Types.VARCHAR });
 
 		if(rowsUpdated != 1)
 		{
@@ -144,7 +149,7 @@ public class JdbcAuthenticationAccountRepositoryImpl extends AbstractAuthenticat
 	{
 		public UserDetails mapRow(ResultSet rs, int rowNum) throws SQLException 
 		{
-			String roleName = rs.getString(6);			//column 6 : authorities
+			String roleName = rs.getString(7);			//column 7 : authorities
 			GrantedAuthority userAuth = new SimpleGrantedAuthority(roleName);
 			Set<GrantedAuthority> authSet = new HashSet<GrantedAuthority>();
 			authSet.add(userAuth);
@@ -155,6 +160,7 @@ public class JdbcAuthenticationAccountRepositoryImpl extends AbstractAuthenticat
 					rs.getBoolean(3),		//activated?
 					rs.getInt(4),			//attempts left
 					rs.getDate(5),			//PasswordLastChangeDate
+					rs.getString(6),		//MFA secret key
 					authSet					//authorities
 					);
 			

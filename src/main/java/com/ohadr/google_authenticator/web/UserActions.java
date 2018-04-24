@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.RedirectView;
 
+import com.ohadr.google_authenticator.TOTPCodeUtils;
 import com.ohadr.google_authenticator.repository.AuthenticationAccountRepository;
 import com.ohadr.google_authenticator.repository.InMemoryAuthenticationUserImpl;
 
@@ -137,6 +138,7 @@ public class UserActions {
 					false,									//start as de-activated
 					5, //MaxPasswordEntryAttempts
 					null,					//set by the repo-impl
+					TOTPCodeUtils.getRandomSecretKey(),
 					authorities);			
 
 			repository.createUser(user);

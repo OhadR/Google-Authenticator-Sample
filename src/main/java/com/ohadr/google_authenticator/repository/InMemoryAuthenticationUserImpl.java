@@ -23,6 +23,7 @@ public class InMemoryAuthenticationUserImpl implements UserDetails
 	private boolean 	activated;
 	private Date 		passwordLastChangeDate;
 	private int 		loginAttemptsLeft;
+	private String 		mfaSecretKey;
     private final Set<GrantedAuthority> authorities;
 
 	
@@ -32,6 +33,7 @@ public class InMemoryAuthenticationUserImpl implements UserDetails
 			boolean activated,
 			int	loginAttemptsLeft,
 			Date passwordLastChangeDate,
+			String mfaSecretKey,
 			Collection<? extends GrantedAuthority> authorities)
 	{
 		this.email = username;
@@ -39,6 +41,7 @@ public class InMemoryAuthenticationUserImpl implements UserDetails
 		this.activated = activated;
 		this.loginAttemptsLeft = loginAttemptsLeft;
 		this.passwordLastChangeDate = passwordLastChangeDate;
+		this.mfaSecretKey = mfaSecretKey;
         this.authorities = Collections.unmodifiableSet(sortAuthorities(authorities));
 	}
 
@@ -100,6 +103,10 @@ public class InMemoryAuthenticationUserImpl implements UserDetails
 		return true;
 	}
 
+	public String getMfaSecretKey() 
+	{
+		return mfaSecretKey;
+	}
 
 	
     /**
