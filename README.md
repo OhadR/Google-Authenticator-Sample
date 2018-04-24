@@ -3,16 +3,17 @@ Google-Authenticator-Sample   [![Build Status](https://travis-ci.org/OhadR/Googl
 
 
 
-This project is a xxx POC,  
-
+This project is a demo project of how to connect Spring-Security with 2-factor-authentication (2FA / MFA)
+such as Google Authenticator.
 
 
 
 Make it work
 ------------
 * Deploy the WAR on a servlet container, e.g. tomcat.
-* Browse http://localhost:8080/oauth2-client/hello. The client needs a login by itsealf: admin/admin (Spring Security expects your client web-app to have its own credentials).
-* client should access the resource using the access-token, and print a message.
+* this demo app works in front of MySQL server (repository layer)
+* Browse http://localhost:8089/secure/hello. The client needs a login, but first it has to register.
+* client should access the resource, and print a message.
 
 How to run?
 -----------
