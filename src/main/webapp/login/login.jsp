@@ -25,13 +25,12 @@
 				<td><input type='password' name='password' /></td>
 			</tr>
 			<tr>
-				<td><input type='checkbox' name='remember_me' /></td>
-				<td>Remember me on this computer.</td>
+				<td>Code:</td>
+				<td><input type='text' name='mfa_code' /></td>
 			</tr>
 			<tr>
 				<td colspan='2'><input name="submit" type="submit"
 					value="Login" /></td>
-				<td><a href="../login/forgotPassword.htm">Forgot Password?</a></td>
 			</tr>
 			<tr>
 				<td><a href="../login/createAccount.jsp">Register</a></td>
