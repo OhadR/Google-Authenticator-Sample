@@ -68,7 +68,7 @@ public class UserActions {
 //		model.addAttribute("qr", userService.generateQRUrl(user));
 
 		String secretKey = TOTPCodeUtils.getRandomSecretKey();
-		String QRUrl = QRCodeGenerator.generateQRUrl(secretKey, email, email);
+		String QRUrl = QRCodeGenerator.generateQRUrl(secretKey, email, "Cellebrite.com");
 		attributes.put("qr",  QRUrl);
 		log.info("secretKey= " + secretKey);
 		log.info("QRUrl= " + QRUrl);
