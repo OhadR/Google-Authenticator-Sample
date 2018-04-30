@@ -15,7 +15,6 @@
 		</p>
 		<img src=<%=request.getParameter("qr")%> />
 	</div>
-	<a href="/login" class="btn btn-primary">Go to login page</a>
 
 </body>
 </html>
