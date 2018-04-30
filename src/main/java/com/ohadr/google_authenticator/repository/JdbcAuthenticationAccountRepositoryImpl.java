@@ -21,10 +21,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
-
-import com.ohadr.google_authenticator.TOTPCodeUtils;
 
 
 public class JdbcAuthenticationAccountRepositoryImpl extends AbstractAuthenticationAccountRepository
@@ -56,9 +53,6 @@ public class JdbcAuthenticationAccountRepositoryImpl extends AbstractAuthenticat
 	
 	private static final String DEFAULT_UPDATE_ACTIVATED_STATEMENT = "update " + TABLE_NAME + 
 			" set enabled = ? where USERNAME = ?";
-
-	private static final String DEFAULT_UPDATE_ATTEMPTS_CNTR_STATEMENT = "update " + TABLE_NAME +
-			" set LOGIN_ATTEMPTS_COUNTER = ? where USERNAME = ?";
 
 	private static final String DEFAULT_UPDATE_AUTHORITY_STATEMENT = "update " + TABLE_NAME + 
 			" set authorities = ? where USERNAME = ?";
@@ -197,17 +191,6 @@ public class JdbcAuthenticationAccountRepositoryImpl extends AbstractAuthenticat
 			throw new NoSuchElementException("No user with email: " + email);
 		}
 	}
-
-	@Override
-	protected void updateLoginAttemptsCounter(String email, int attempts) 
-	{
-		int count = jdbcTemplate.update(DEFAULT_UPDATE_ATTEMPTS_CNTR_STATEMENT, attempts, email);
-		if (count != 1)
-		{
-			throw new NoSuchElementException("No user with email: " + email);
-		}
-	}
-
 
 	@Override
 	public void updateUser(UserDetails user)

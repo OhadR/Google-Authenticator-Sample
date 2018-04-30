@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 public abstract class AbstractAuthenticationAccountRepository implements AuthenticationAccountRepository
 {
 	protected abstract void setEnabledFlag(String email, boolean flag) throws NoSuchElementException; 
-	protected abstract void updateLoginAttemptsCounter(String email, int attempts) throws NoSuchElementException; 
 	
 	public AbstractAuthenticationAccountRepository()
 	{
