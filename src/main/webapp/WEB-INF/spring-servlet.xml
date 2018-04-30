@@ -91,7 +91,8 @@
     </bean>
      -->
     
-    <bean id="userDetailsService" class="com.ohadr.google_authenticator.repository.JdbcAuthenticationAccountRepositoryImpl" />
+<!--      <bean id="userDetailsService" class="com.ohadr.google_authenticator.repository.JdbcAuthenticationAccountRepositoryImpl" /> -->
+    <bean id="userDetailsService" class="com.ohadr.google_authenticator.repository.InMemAuthenticationAccountRepositoryImpl" />
 
 
 	<bean id="passwordEncoder" 	class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
